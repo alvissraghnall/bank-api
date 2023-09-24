@@ -15,7 +15,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         {
-          provide: getRepositoryToken(User), // Replace with the actual repository token
+          provide: getRepositoryToken(User),
           useClass: Repository,
         },
       ],

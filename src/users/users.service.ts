@@ -61,7 +61,7 @@ export class UsersService {
     return this.usersRepository.save(updatedUser);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: number): boolean {
+    return false;
   }
 }

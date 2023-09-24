@@ -33,7 +33,11 @@ describe('AuthResolver', () => {
             findOne: jest.fn(),
           }
         },
-        AuthService, UsersService, HashService, JwtService, JwtKeyService],
+        AuthService, UsersService, HashService, JwtService, JwtKeyService,
+        {
+          provide: CurrentUser,
+          useValue: (context: any) => context.req.user, // Mock the CurrentUser decorator
+        }],
     }).compile();
 
     authResolver = module.get<AuthResolver>(AuthResolver);
@@ -74,7 +78,6 @@ describe('AuthResolver', () => {
       expect(result.user).toBe(mockUser);
     });
 
-    // Add more test cases for error scenarios...
   });
 
   describe('signup', () => {
@@ -106,8 +109,31 @@ describe('AuthResolver', () => {
       expect(result).toBe(mockUser);
     });
 
-    // Add more test cases for error scenarios...
   });
 
-  // Add tests for other resolver methods such as checkJwt and whoami...
+  describe('checkJwt', () => {
+    it('should return true', async () => {
+      const result: boolean = await authResolver.checkJwt();
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('whoami', () => {
+    it('should return the current user', async () => {
+      const mockUser: User = {
+        id: '1',
+        phoneNumber: '1234567890',
+        password: 'hashedPassword',
+        username: 'testuser',
+        balance: 100,
+        email: '',
+        transactions: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const result: User = await authResolver.whoami(mockUser);
+      expect(result).toEqual(mockUser);
+    });
+  });
 });

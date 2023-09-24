@@ -54,7 +54,7 @@ describe('depositService', () => {
       // Mock the behavior of processTransaction to throw a different exception
       const processTransactionSpy = jest.spyOn(transactionsService, 'processTransaction');
       processTransactionSpy.mockImplementation(() => {
-        throw new BadRequestException('Insufficient balance'); // Adjust the exception type as needed
+        throw new BadRequestException('Insufficient balance'); 
       });
     
       try {

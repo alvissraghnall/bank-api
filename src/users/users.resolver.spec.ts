@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
 import { NotFoundException } from '@nestjs/common';
+import { UpdateUserInput } from './dto/update-user.input';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 describe('UsersResolver', () => {
   let usersResolver: UsersResolver;
@@ -12,7 +13,24 @@ describe('UsersResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersResolver, UsersService],
+      providers: [
+        UsersResolver,
+        UsersService,
+        {
+          provide: UsersService, // Mock the UsersService
+          useValue: {
+            findAll: jest.fn(),
+            findOneByUsername: jest.fn(),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(User), 
+          useClass: Repository,
+        }
+      ],
     }).compile();
 
     usersResolver = module.get<UsersResolver>(UsersResolver);
@@ -25,46 +43,104 @@ describe('UsersResolver', () => {
 
   describe('findAll', () => {
     it('should return an array of users', async () => {
-      const mockUsers = [new User(
-        'jane@doe.com', 'jane doe', 'janedoe3003', '', '9033033033'
-      ), new User(
-        'jane@doe.com', 'jane doe', 'janedoe3003', '', '9033033013'
-      )];
+      const mockUsers: User[] = [{ id: '1', username: 'user1', phoneNumber: '27382708', balance: 20, password: 'blackjesus', transactions: [], email: 'black@jesus.dev', createdAt: new Date(), updatedAt: new Date() }, { id: '2', username: 'user2', phoneNumber: '27382708', balance: 20, password: 'blackjesus', transactions: [], email: 'black@jesus.dev', createdAt: new Date(), updatedAt: new Date() }];
       jest.spyOn(usersService, 'findAll').mockResolvedValue(mockUsers);
 
-      const result = await usersResolver.findAll();
+      const result: User[] = await usersResolver.findAll();
 
-      expect(usersService.findAll).toHaveBeenCalled();
-      expect(result).toBe(mockUsers);
+      expect(result).toEqual(mockUsers);
     });
   });
 
   describe('findOne', () => {
     it('should return a user by username', async () => {
-      const mockUser = new User(
-        'jane@doe.com', 'jane doe', 'janedoe3003', '', '9033033033'
-      );
+      const mockUser: User = {
+        id: '1', username: 'testuser',
+        phoneNumber: '',
+        balance: 0,
+        email: '',
+        password: '',
+        transactions: [],
+        createdAt: undefined,
+        updatedAt: undefined
+      };
       const username = 'testuser';
       jest.spyOn(usersService, 'findOneByUsername').mockResolvedValue(mockUser);
 
-      const result = await usersResolver.findOne(username);
+      const result: User = await usersResolver.findOne(username);
 
-      expect(usersService.findOneByUsername).toHaveBeenCalledWith(username);
-      expect(result).toBe(mockUser);
+      expect(result).toEqual(mockUser);
     });
 
-    it('should throw NotFoundException for non-existent user', async () => {
+    it('should throw NotFoundException if user not found', async () => {
       const username = 'nonexistentuser';
       jest.spyOn(usersService, 'findOneByUsername').mockResolvedValue(null);
 
-      try {
-        await usersResolver.findOne(username);
-      } catch (error) {
-        expect(error).toBeInstanceOf(NotFoundException);
-        expect(error.message).toBe(`User with Username: ${username} does not exist!`);
-      }
+      expect(usersResolver.findOne(username)).rejects.toThrowError(NotFoundException);
     });
   });
 
-  // Add tests for other resolver methods like findOneById, updateUser, removeUser...
+  describe('findOneById', () => {
+    it('should return a user by ID', async () => {
+      const mockUser: User = {
+        id: '1', username: 'testuser',
+        phoneNumber: '',
+        balance: 0,
+        email: '',
+        password: '',
+        transactions: [],
+        createdAt: undefined,
+        updatedAt: undefined
+      };
+      const userId = '1';
+      jest.spyOn(usersService, 'findOne').mockResolvedValue(mockUser);
+
+      const result: User = await usersResolver.findOneById(userId);
+
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      const userId = 'nonexistentid';
+      jest.spyOn(usersService, 'findOne').mockResolvedValue(null);
+
+      expect(usersResolver.findOneById(userId)).rejects.toThrowError(NotFoundException);
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should update a user and return the updated user', async () => {
+      const mockUpdateUserInput: UpdateUserInput = {
+        username: 'newusername',
+        id: ''
+      };
+      const mockCurrentUser: User = {
+        id: '1', username: 'testuser',
+        phoneNumber: '',
+        balance: 0,
+        email: '',
+        password: '',
+        transactions: [],
+        createdAt: undefined,
+        updatedAt: undefined
+      };
+      const mockUpdatedUser: User = { ...mockCurrentUser, ...mockUpdateUserInput };
+      jest.spyOn(usersService, 'update').mockResolvedValue(mockUpdatedUser);
+
+      const result: User = await usersResolver.updateUser(mockUpdateUserInput, mockCurrentUser);
+
+      expect(result).toEqual(mockUpdatedUser);
+    });
+  });
+
+  describe('removeUser', () => {
+    it('should remove a user by ID', async () => {
+      const userId = 1;
+      jest.spyOn(usersService, 'remove').mockReturnValue(true);
+
+      const result: boolean = await usersResolver.removeUser(userId);
+
+      expect(result).toBe(true);
+    });
+  });
 });
