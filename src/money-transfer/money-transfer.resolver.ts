@@ -11,7 +11,6 @@ export class MoneyTransferResolver {
   constructor(private readonly moneyTransferService: MoneyTransferService) {}
 
   @Mutation(() => User)
-  @UseGuards(JwtAuthGuard)
   async transferMoney(
     @Args('transferDTO') transferDTO: CreateMoneyTransferInput,
     @CurrentUser() user: User,

@@ -11,7 +11,12 @@ describe('WithdrawalResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [WithdrawalResolver, WithdrawalService],
+      providers: [{
+        provide: WithdrawalService,
+        useValue: {
+          withdrawFunds: jest.fn()
+        }
+      }, WithdrawalResolver],
     }).compile();
 
     withdrawalResolver = module.get<WithdrawalResolver>(WithdrawalResolver);

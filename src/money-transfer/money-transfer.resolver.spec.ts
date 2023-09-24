@@ -15,34 +15,13 @@ describe('MoneyTransferResolver', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        MoneyTransferResolver,
-        MoneyTransferService,
         {
-          provide: JwtAuthGuard,
-          useValue: {},
+          provide: MoneyTransferService,
+          useValue: {
+            transferMoney: jest.fn(),
+          },
         },
-        {
-          provide: CurrentUser,
-          useValue: (context: any) => context.req.user, // Mock the CurrentUser decorator
-        }, 
-        {
-          provide: getRepositoryToken(User),
-          useValue: {
-            save: jest.fn(),
-            findOne: jest.fn(),
-            findOneBy: jest.fn(),
-            update: jest.fn()
-          }
-        }, 
-        {
-          provide: getRepositoryToken(MoneyTransfer),
-          useValue: {
-            save: jest.fn(),
-            findOne: jest.fn(),
-            findOneBy: jest.fn(),
-            update: jest.fn()
-          }
-        }
+        MoneyTransferResolver
       ],
     }).compile();
 
