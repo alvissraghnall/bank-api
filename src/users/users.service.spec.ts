@@ -1,46 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
-import { JwtPayload } from '../auth/jwt/jwt.payload';
-import { DataSource, Repository } from 'typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { Transaction } from '@transactions/entities/transaction.entity';
 
 describe('UsersService', () => {
   let usersService: UsersService;
   let userRepository: Repository<User>;
-  let dataSource: DataSource;
 
-  jest.setTimeout(15000);
-
-  beforeAll(async () => {
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        TypeOrmModule.forRoot({
-          type: "postgres",
-          url: process.env.TEST_DB_URL,
-          // synchronize: true,
-          // dropSchema: true,
-          // autoLoadEntities: true,
-          entities: [User, Transaction],
-        }),
-        TypeOrmModule.forFeature([User]),
+      providers: [
+        UsersService,
+        {
+          provide: getRepositoryToken(User), // Replace with the actual repository token
+          useClass: Repository,
+        },
       ],
-      providers: [UsersService],
     }).compile();
-    
-    dataSource = module.get<DataSource>(DataSource);
+
     usersService = module.get<UsersService>(UsersService);
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
-  });
-
-  afterAll(async () => {
-    
-    await dataSource.destroy();
   });
 
   it('should be defined', () => {
@@ -50,12 +32,12 @@ describe('UsersService', () => {
   describe('create', () => {
     it('should create a new user', async () => {
       const createUserInput: CreateUserInput = {
-        email: 'test@kdot.com',
-        username: 'kdot',
+        email: 'test@blanche.com',
         password: 'password',
         avatar: 'avatar-url',
-        phoneNumber: '1214567890',
-        confirmPassword: ''
+        username: 'test blanche',
+        phoneNumber: '1230067890',
+        confirmPassword: 'password', // Add confirmPassword to match your DTO
       };
 
       const newUser = new User(
@@ -63,53 +45,54 @@ describe('UsersService', () => {
         createUserInput.username,
         createUserInput.password,
         createUserInput.avatar,
-        createUserInput.phoneNumber,
+        createUserInput.phoneNumber
       );
 
-      // userRepository.create.mockReturnValue(newUser);
-      // userRepository.save(newUser);
+      // Mock the save method of the repository
+      const saveSpy = jest.spyOn(userRepository, 'save').mockResolvedValue(newUser);
 
-      const savedUser = await usersService.create(createUserInput);
+      const result = await usersService.create(createUserInput);
 
-      expect(savedUser).toEqual(newUser);
-      expect(userRepository.create).toHaveBeenCalledWith(newUser);
-      expect(userRepository.save).toHaveBeenCalledWith(newUser);
+      expect(result).toEqual(newUser);
+      expect(saveSpy).toHaveBeenCalledWith(newUser);
     });
   });
 
-  describe('findOneByPhoneNumber', () => {
-    it('should find a user by phone number', async () => {
-      const phoneNumber = '1234560180';
-      const user = new User(
-        'test@r2bees.com',
-        'r2bees',
-        'password',
-        'avatar-url',
-        phoneNumber,
-      );
+  describe('findOne', () => {
+    it('should find a user by ID', async () => {
+      const userId = 'some-user-id';
+      const user = new User('test@blanche.com', 'test blanche', 'password', 'avatar-url', '1230067890');
+      user.id = userId;
 
-      userRepository.save(user);
+      // Mock the findOne method of the repository
+      const findOneSpy = jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
 
-      // const repoFound = userRepository.findOne({ where: { phoneNumber } });
+      const result = await usersService.findOne(userId);
 
-      // userRepository.findOneBy({ phoneNumber });
-
-      const foundUser = await usersService.findOneByPhoneNumber(phoneNumber);
-
-      expect(userRepository.findOne).toHaveBeenCalled();
-      expect(foundUser).toEqual(user);
-      
+      expect(result).toEqual(user);
+      expect(findOneSpy).toHaveBeenCalledWith({ where: { id: userId } });
     });
+  });
 
-    it('should return null when user not found', async () => {
-      const phoneNumber = 'nonexistent';
+  describe('update', () => {
+    it('should update a user', async () => {
+      const userId = 'some-user-id';
+      const updateUserInput: UpdateUserInput = {
+        username: 'updated-username',
+        id: ''
+      };
 
-      // userRepository.findOne(null);
+      const user = new User('test@blanche.com', 'test blanche', 'password', 'avatar-url', '1230067890');
+      user.id = userId;
 
-      const foundUser = await usersService.findOneByPhoneNumber(phoneNumber);
+      // Mock the findOne and save methods of the repository
+      const findOneSpy = jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
+      const saveSpy = jest.spyOn(userRepository, 'save').mockResolvedValue(user);
 
-      expect(foundUser).toBeNull();
-      
+      const result = await usersService.update(user, updateUserInput);
+
+      expect(result).toEqual(user);
+      expect(saveSpy).toHaveBeenCalledWith({ ...updateUserInput, id: user.id });
     });
   });
 });

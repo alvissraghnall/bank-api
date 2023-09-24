@@ -10,14 +10,30 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 import { GqlAuthGuard } from './guards/gql-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '@common/current-user.decorator';
+import { UsersService } from '@users/users.service';
+import { UsersModule } from '@users/users.module';
+import { HashService } from './hash/hash.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtKeyService } from './jwt/jwt-key.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
-describe('AuthResolver', () => {
+describe('AuthResolver', () => { 
   let authResolver: AuthResolver;
   let authService: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthResolver, AuthService],
+      providers: [AuthResolver,
+        {
+          provide: getRepositoryToken(User),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+            findOne: jest.fn(),
+          }
+        },
+        AuthService, UsersService, HashService, JwtService, JwtKeyService],
     }).compile();
 
     authResolver = module.get<AuthResolver>(AuthResolver);

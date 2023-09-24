@@ -66,6 +66,7 @@ export class JwtAuthGuard implements CanActivate {
     protected getRequest<T> (context: ExecutionContext): T {
         const ctx = GqlExecutionContext.create(context);
 
+        console.log(ctx.getContext());
         return ctx.getContext().req;
     }
 

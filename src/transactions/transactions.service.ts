@@ -11,7 +11,7 @@ import { UpdateTransactionInput } from './dto/update-transaction.input';
 @Injectable()
 export class TransactionsService {
   create(createTransactionInput: CreateTransactionInput) {
-    throw new Error('Method not implemented.');
+    return createTransactionInput;
   }
   findAll() {
     throw new Error('Method not implemented.');
