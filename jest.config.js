@@ -40,10 +40,11 @@ module.exports = {
     transform: {
         "^.+\\.ts$": "ts-jest"
     },
+    // collectCoverageFrom: [
+    //     "**/*.(t|j)s"
+    // ],
     transformIgnorePatterns: ['^.+\\.js$'],
-    collectCoverageFrom: [
-        "**/*.(t|j)s"
-    ],
+    coverageReporters: ["text-summary", "lcov"],
     coverageDirectory: "../coverage",
     preset: 'ts-jest',
     testEnvironment: 'node',
