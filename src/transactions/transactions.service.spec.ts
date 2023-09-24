@@ -52,10 +52,10 @@ describe('TransactionsService', () => {
     it('should process a deposit transaction', async () => {
       // Create a user and save it to the test database
       const user = userRepository.create({
-        username: 'user gold',
-        phoneNumber: '90201960731',
+        username: 'user silver',
+        phoneNumber: '90201990731',
         balance: 1500,
-        email: 'test@gold.com',
+        email: 'test@silver.com',
         password: 'password',
         avatar: 'avatar-url',
         bio: 'Test bio',

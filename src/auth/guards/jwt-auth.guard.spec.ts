@@ -22,7 +22,7 @@ describe('JwtAuthGuard', () => {
   let userRepository: Repository<User>;
 
   const datasourceMockFactory: () => MockType<DataSource> = jest.fn(() => ({
-    getRepository: jest.fn().mockReturnValue(userRepository), // Use the UserRepository mock
+    getRepository: jest.fn().mockReturnValue(userRepository),
   }));
 
   beforeEach(async () => {

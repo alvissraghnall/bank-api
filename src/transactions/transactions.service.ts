@@ -10,21 +10,6 @@ import { UpdateTransactionInput } from './dto/update-transaction.input';
 
 @Injectable()
 export class TransactionsService {
-  create(createTransactionInput: CreateTransactionInput) {
-    return createTransactionInput;
-  }
-  findAll() {
-    throw new Error('Method not implemented.');
-  }
-  findOne(id: number) {
-    throw new Error('Method not implemented.');
-  }
-  update(id: number, updateTransactionInput: UpdateTransactionInput) {
-    throw new Error('Method not implemented.');
-  }
-  remove(id: number) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,

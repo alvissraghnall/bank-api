@@ -38,8 +38,9 @@ module.exports = {
     testRegex: ".*\\.spec\\.ts$",
     // testRegex: ".service\\.spec\\.ts$",
     transform: {
-        "^.+\\.(t|j)s$": "ts-jest"
+        "^.+\\.ts$": "ts-jest"
     },
+    transformIgnorePatterns: ['^.+\\.js$'],
     collectCoverageFrom: [
         "**/*.(t|j)s"
     ],

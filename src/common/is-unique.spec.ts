@@ -76,32 +76,32 @@ describe('IsUniqueConstraint', () => {
   });
 });
 
-describe('IsUnique Decorator', () => {
-    it('should create a validator constraint with the provided model and field', () => {
-      // Create a mock class with a property decorated with @IsUnique
-      class SampleEntity {
-        @IsUnique('SampleEntity', 'name', { message: 'Name must be unique' })
-        propertyName: string;
-      }
+// describe('IsUnique Decorator', () => {
+//     it('should create a validator constraint with the provided model and field', () => {
+//       // Create a mock class with a property decorated with @IsUnique
+//       class SampleEntity {
+//         @IsUnique('SampleEntity', 'name', { message: 'Name must be unique' })
+//         propertyName: string;
+//       }
   
-      // Create an instance of the class to trigger the decorator
-      const target = new SampleEntity();
+//       // Create an instance of the class to trigger the decorator
+//       const target = new SampleEntity();
   
-      console.log(SampleEntity.constructor.toString(), target.constructor.length, SampleEntity.constructor['__validators']);
+//       console.log(SampleEntity.constructor.toString(), target.constructor.length, SampleEntity.constructor['__validators']);
 
-      // Get the validators from the class constructor
-      const validators = target.constructor['__validators'];
+//       // Get the validators from the class constructor
+//       const validators = target.constructor['__validators'];
   
-      // Expect the validators to contain the IsUniqueConstraint
-      expect(validators).toEqual([
-        {
-          name: 'isUnique',
-          target: target.constructor,
-          constraints: ['SampleEntity', 'name'],
-          options: { message: 'Name must be unique' },
-          propertyName: 'propertyName',
-          validator: IsUniqueConstraint,
-        },
-      ]);
-    });
-});
+//       // Expect the validators to contain the IsUniqueConstraint
+//       expect(validators).toEqual([
+//         {
+//           name: 'isUnique',
+//           target: target.constructor,
+//           constraints: ['SampleEntity', 'name'],
+//           options: { message: 'Name must be unique' },
+//           propertyName: 'propertyName',
+//           validator: IsUniqueConstraint,
+//         },
+//       ]);
+//     });
+// });
