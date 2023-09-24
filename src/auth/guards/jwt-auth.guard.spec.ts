@@ -61,7 +61,7 @@ describe('JwtAuthGuard', () => {
           useFactory: datasourceMockFactory,
         },
       ],
-    }).compile();
+    }).compile(); 
 
     guard = module.get<JwtAuthGuard>(JwtAuthGuard);
     reflector = module.get<Reflector>(Reflector);
